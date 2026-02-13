@@ -1,0 +1,96 @@
+body {
+    margin: none;
+    padding: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: url("https://i.pinimg.com/1200x/e6/cd/2b/e6cd2bc805f09dcfc41190a4660cb8ea.jpg") no-repeat center center fixed;
+    background-size: cover;
+}
+
+
+.content {
+    width: 1000px;
+    height: 700px;
+    background: url("https://i.pinimg.com/1200x/e6/cd/2b/e6cd2bc805f09dcfc41190a4660cb8ea.jpg") no-repeat center center fixed;
+    display: flex;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.content-welcome {
+    width: 500px;
+    height: 100%;
+}
+
+.content-register {
+    width: 500px;
+    height: 100%;
+}
+
+.content-logo {
+    margin-top: 50px;
+    margin-left: 50px;
+    width: 150px;
+    height: 150px;
+}
+
+.content-text {
+    width: 400px;
+    height: 200px;
+    margin-top: 35px;
+    margin-left: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 70px;
+    color: aliceblue;
+}
+
+.welcome-text {
+    border-bottom: solid 10px aliceblue;
+}
+
+.content-info {
+    width: 400px;
+    height: 200px;
+    margin-left: 50px;
+}
+
+.content-register {
+    width: 100%;
+    height: 100%;
+}
+
+.h3 {
+    margin: 50px 0 0 50px !important;
+    padding-bottom: 50px;
+    color: aliceblue !important;
+    font-size: 60px !important;
+}
+
+form {
+    display: block !important;
+    justify-content:center !important;
+    align-items: center !important;
+}
+
+input, label, button {
+    margin-left: 50px !important;
+}
+
+input {
+    margin-bottom: 15px !important;
+}
+
+.form-check-label{
+    margin-left: 5px !important;
+    color: aliceblue !important;
+    font-size: 20px !important;
+}
+
+.login-message {
+    color: aliceblue;
+    font-size: 20px;
+}
