@@ -5,7 +5,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: url("https://i.pinimg.com/1200x/e6/cd/2b/e6cd2bc805f09dcfc41190a4660cb8ea.jpg") no-repeat center center fixed;
+    background: url("../images/backgroundWeb.jpeg") no-repeat center center fixed;
     background-size: cover;
 }
 
@@ -13,7 +13,7 @@ body {
 .content {
     width: 1000px;
     height: 700px;
-    background: url("https://i.pinimg.com/1200x/e6/cd/2b/e6cd2bc805f09dcfc41190a4660cb8ea.jpg") no-repeat center center fixed;
+    background: url("../images/backgroundWeb.jpeg") no-repeat center center fixed;
     display: flex;
     border-radius: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
