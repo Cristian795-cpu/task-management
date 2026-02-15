@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/register.css">
+    <!-- load Bootstrap before custom rules so our button styles can override -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/register.css">
   </head>
   <body>
     <title>Login</title>
@@ -40,11 +41,11 @@
                                 <input type="password" class="form-control w-75" id="floatingPassword" placeholder="Password"> 
                                 <label for="floatingPassword">Password</label> </div> <div class="form-check text-start my-3"> 
                                 <p class="login-message text-center text-md-start"> Don't have an account?
-                                    <a href="./register.html" class="text-primary text-decoration-none"> register</a>
+                                    <a href="./register.html" class="text-primary text-decoration-none color-text"> register</a>
                                 </p>
                             </div> 
                             
-                            <button class="btn btn-primary w-75 py-2" > Login </button> 
+                            <button class="btn btn-primary btn-log-in w-75 py-2" > Login </button> 
                         </form>
                     </div>
                 </div>

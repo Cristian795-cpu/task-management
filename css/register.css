@@ -5,18 +5,17 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: url("../images/backgroundWeb.jpeg") no-repeat center center fixed;
-    background-size: cover;
+    background: linear-gradient(#0A3A40);
 }
 
 
 .content {
     width: 1000px;
     height: 700px;
-    background: url("../images/backgroundWeb.jpeg") no-repeat center center fixed;
+    background-color: #042326;
     display: flex;
     border-radius: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
 }
 
 .content-welcome {
@@ -93,4 +92,28 @@ input {
 .login-message {
     color: aliceblue;
     font-size: 20px;
+}
+
+.login-link, a.text-primary {
+    color: aqua !important;
+}
+
+.btn, .btn-primary {
+    background-color: #0F5959;
+    border: solid 1px #0F5959;
+}
+
+.btn:hover, .btn-primary:hover {
+    background-color: #1D7373;
+    border: solid 1px #1D7373;
+}
+
+.btn.btn-primary.btn-log-in {
+    background-color: #0F5959;
+    border: solid 1px #0F5959;
+}
+
+.btn.btn-primary.btn-log-in:hover {
+    background-color: #1D7373;
+    border: solid 1px #1D7373;
 }

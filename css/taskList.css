@@ -1,0 +1,161 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}
+
+.father {
+    display: flex;
+    flex-direction: row;
+
+}
+
+.off-canvas {
+    width: 500px;
+    height: 100vh;
+    background-color: #0F5959;
+}
+
+.content-logo {
+    width: 360px;
+    height: 70px;
+    margin-left: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-logo, #name-logo {
+    margin-top: 10px;
+}
+
+#name-logo {
+    margin-top: 45px;
+    font-size: 40px;
+    font-family: 'Gravitas One', cursive;
+    color: aliceblue;
+}
+
+.new-notebook {
+    width: 360px;
+    height: 50px;
+    margin-top: 30px;
+    margin-left: 15px;
+}
+
+.main-notebook {
+    width: 360px;
+    height: 780px;
+    margin-top: 30px;
+    margin-left: 15px;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 0.2fr);
+}
+
+.container-file {
+    width: 100px;
+    height: 100px;
+    background-color: #0A3A40;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.file-notebook {
+    width: 70px;
+    height: 70px;
+}
+
+.content-App-web {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.background-profile {
+    width: 100%;
+    height: 300px;
+    background: url("../images/background-profile.jpg");
+}
+
+.content-notes-father {
+    width: 100%;
+    height: 674px;
+    background-color: #042326;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-photo {
+    position: absolute; 
+    top: 220px; 
+    left: 100px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: url("../images/profile-photo.jpg");
+    background-size: cover;
+    background-position: center;
+    z-index: 3;
+    border: solid 15px #042326;
+}
+
+.content-welcome-user {
+    position: absolute;         
+    top: 320px;
+    left: 300px;
+    width: 300px;
+    height: 100px;
+    color: aliceblue;
+    z-index: 4;
+    margin: 0;
+}
+
+.content-cards-notes {
+    margin-top: 100px;
+    width: 1450px;
+    height: 530px;
+    background-color: #0A3A40;
+    border-radius: 10px;
+}
+
+.profile-edit {
+    position: absolute;
+    top: 310px;
+    left: 190px;
+    z-index: 5;
+    padding: 4px;
+}
+
+.profile-edit .bi,
+.profile-edit .bi-camera {
+    display: inline-flex;
+    width: 50px;
+    height: 50px;
+    background-color: #0A3A40;
+    transition: background 0.5s ease;
+    border-radius: 100%;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 25px;
+}
+
+.bi:hover,
+.profile-edit:hover .bi-camera:hover {
+    background-color: #107361;
+}
+
+.btn.btn-outline-secondary {
+    background-color: #042326;
+    border: solid 1px #042326;
+    color: aliceblue;
+}
+
+.btn.btn-outline-secondary:hover {
+    background-color: #0A3A40;
+    border: solid 1px #0A3A40;
+}
