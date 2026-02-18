@@ -1,6 +1,7 @@
-import { User } from "./User.js";
+import { User } from "../model/User.js";
 
 const buttonLogin = document.querySelector(".btn");
+
 
 buttonLogin.addEventListener("click", (e)=> {
     e.preventDefault();
@@ -8,9 +9,6 @@ buttonLogin.addEventListener("click", (e)=> {
     const inputGmail = document.getElementById("floatingInput").value;
     const inputpassword = document.getElementById("floatingPassword").value;
 
-    
-
-    
     try{
        const array = JSON.parse(localStorage.getItem("users"));
 
@@ -23,7 +21,8 @@ buttonLogin.addEventListener("click", (e)=> {
         let userFound = users.find(user => user.getEmail === inputGmail && user.getPassword === inputpassword);
 
         if(userFound) {
-            window.location.replace("../html/taskList.html")
+            window.location.replace("taskList.html");
+            localStorage.setItem("login-User", JSON.stringify(userFound));
         }else {
             alert("Usuario o contraseña incorrectos");
         }

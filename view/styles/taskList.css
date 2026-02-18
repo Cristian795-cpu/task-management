@@ -44,28 +44,69 @@ body {
 }
 
 .main-notebook {
-    width: 360px;
+    width: 380px;
     height: 780px;
-    margin-top: 30px;
+    padding-right: 50px;
     margin-left: 15px;
-
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 0.2fr);
+    overflow: hidden;
 }
 
-.container-file {
-    width: 100px;
-    height: 100px;
-    background-color: #0A3A40;
+.container-files {
+    width: 380px;
+    height: 764px;
+    overflow-x: auto;
+}
+
+.file {
+    width: 360px;
+    height: 60px;
+    background-color: #026773;
+    border-radius: 10px;
     display: flex;
-    justify-content: center;
+    margin-top: 15px;
+    transition: background 0.5s ease;
+}
+
+.file:hover {
+    background-color: #3CA6A6;
+}
+
+.bi, .bi-journals {
+    font-size: 30px;
+    color: #023535;
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+.container-delete {
+    width: 100%;
+    display: flex;
+    justify-content:flex-end;
     align-items: center;
+}
+
+.bi-trash-fill {
+    margin-right: 10px;
+    font-size: 30px;
+    color: #023535;
+    transition: color 0.5s ease;
+    cursor: pointer;
+}
+
+.bi-trash-fill:hover {
+    color: red;
 }
 
 .file-notebook {
     width: 70px;
-    height: 70px;
+    height: 70px; 
+}
+
+.notebook-title {
+    padding-right: 130px;
+    margin-top: 10px;
+    margin-left: 10px;
+    font-size: 20px;
 }
 
 .content-App-web {
@@ -142,9 +183,9 @@ body {
     justify-content: center;
     color: #ffffff;
     font-size: 25px;
+    cursor: pointer;
 }
 
-.bi:hover,
 .profile-edit:hover .bi-camera:hover {
     background-color: #107361;
 }

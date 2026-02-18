@@ -1,4 +1,4 @@
-import { User } from "./User.js";
+import { User } from "../model/User.js";
 
 const buttonRegister = document.querySelector(".btn");
 const isCheck = document.getElementById("checkDefault");

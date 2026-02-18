@@ -1,8 +1,11 @@
+import { File } from "./File.js";
+
 export class User {
     constructor(name, email, password) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.listFile = [];
     }
 
     set setName(name) {
@@ -29,4 +32,11 @@ export class User {
         return this.password;
     }
 
+    set setListFile(listFile) {
+        this.listFile = listFile;
+    }
+
+    get getListFile() {
+        return this.listFile;
+    }
 }
