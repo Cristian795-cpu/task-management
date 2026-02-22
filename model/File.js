@@ -4,6 +4,7 @@ export class File {
     constructor(nameFile) {
         this.nameFile = nameFile;
         this.tasks = [];
+        this._isActive = false;
     }
 
     setName(name) {
@@ -20,5 +21,12 @@ export class File {
 
     getTasks() {
         return this.tasks;
+    }
+    setIsActive(value) {
+        this._isActive = value;
+    }
+
+    getIsActive() {
+        return this._isActive;
     }
 }

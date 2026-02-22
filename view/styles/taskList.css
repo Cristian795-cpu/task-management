@@ -161,6 +161,13 @@ body {
     height: 530px;
     background-color: #0A3A40;
     border-radius: 10px;
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px;
 }
 
 .profile-edit {
@@ -199,4 +206,27 @@ body {
 .btn.btn-outline-secondary:hover {
     background-color: #0A3A40;
     border: solid 1px #0A3A40;
+}
+
+.card-note {
+    margin: auto;
+    width: 10rem;
+    height: 15rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+}
+
+.bi-plus-square-dotted {
+    position: absolute;
+    font-size: 100px;
+    text-align: center;
+    color: #9cefa3;
+    cursor: pointer;
+    visibility: visible;
+}
+
+.bi-plus-square-dotted:hover {
+    color: #ffffff;
 }

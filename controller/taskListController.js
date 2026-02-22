@@ -1,10 +1,7 @@
 import { User } from "../model/User.js";
 import { File } from "../model/File.js";
-import { getUserLocalStorage, createUserObject, saveLocalStoreOfRegisteredUser } from "../model/localStorageLogin-user.js";
-
-const btnNewNotebook = document.getElementById("button-addon2");
-const textWelcome = document.getElementById("welcome-user");
-
+import { Task } from "../model/Task.js";
+import { getUserLocalStorage, createUserObject, createLocalStorageFile, saveLocalStoreOfRegisteredUser, buildTaskList, createLocalStorageTask} from "../model/localStorageLogin-user.js";
 
 
 function buildFileMap(userJson) {
@@ -56,8 +53,9 @@ function createListOfFilesToFillIn(userJson) {
     }
 }
 
+//Funcion para la presentacion del Usuario
 function main (){
-    //Agrega el texto al h1
+    const textWelcome = document.getElementById("welcome-user");
     textWelcome.textContent = `¡Hi, ${getUserLocalStorage("login-User").name}!`;
 
     createListOfFilesToFillIn(getUserLocalStorage("login-User"));
@@ -79,6 +77,7 @@ function saveUserFiles(inputNotebook) {
 
 
 //Evento para crear archivos
+const btnNewNotebook = document.getElementById("button-addon2");
 btnNewNotebook.addEventListener("click", ()=> {
     const inputNotebook = document.querySelector(".form-control").value;
 
@@ -95,12 +94,12 @@ btnNewNotebook.addEventListener("click", ()=> {
                         </div>
                         `
     }
-
     saveUserFiles(inputNotebook); 
 });
 
 //Evento para eliminar archivos
-document.querySelector(".container-files").addEventListener("click", (e) => {
+const contenedor = document.querySelector(".container-files");
+contenedor.addEventListener("click", (e) => {
     if (e.target.classList.contains('bi-trash-fill')) {
         // 1. Eliminar del DOM
         const fileDiv = e.target.closest('.file');
@@ -126,6 +125,108 @@ document.querySelector(".container-files").addEventListener("click", (e) => {
             console.log("✅ Eliminado:", tituloEliminar);
             console.log("📚 Lista actualizada:", userJson.listFile);
         }
-        
+
+        //lista auxiliar de file
+        const listFileAux = fi.getListFile.map(item => {
+                                return new File(item.nameFile);
+                            });
+        console.log('miralo: ', listFileAux);
     }
 });
+
+//Evento para seleccionar un Archivo y cambiar de color
+const fileBox = document.querySelectorAll('.file');
+fileBox.forEach(color => {
+    color.addEventListener('click', () => {
+        const text = color.querySelector('.notebook-title').textContent.trim();
+        const jsonParse = getUserLocalStorage('login-User');
+        const listFile = createLocalStorageFile(jsonParse); //aquí ya es una lista de archivos
+        const texto = listFile.find(archivo=> text === archivo.nameFile);
+
+        fileBox.forEach(variable => {
+            variable.style.backgroundColor = "";
+        });
+         
+        if(texto){
+            console.log("encontrado: ", texto);
+            texto.setIsActive(true);
+            color.style.backgroundColor = "#ffffff";
+        }
+        
+        const usuario = createUserObject(jsonParse);
+
+        //Evento para crear una Tarea
+        const conten = document.querySelector(".create-task");
+        conten.addEventListener("click", ()=> {
+            const inputnName = document.getElementById("exampleFormControlInput1").value;
+            const inputDescription = document.getElementById("exampleFormControlTextarea1").value;
+
+            const tarea = new Task(inputnName, inputDescription);
+
+            listFile.forEach(buscar => {
+                if(buscar.getIsActive() === true){
+                    buscar.addTask(tarea); 
+                }
+            });
+            
+            console.log(listFile)
+            const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+            if (modal) modal.hide();
+
+            const contenido = document.querySelector(".content-cards-notes");
+            const carta = document.querySelector(".card-note");
+            const icono = document.querySelector(".bi-plus-square-dotted");
+            document.querySelector(".card-title").textContent = inputnName;
+            document.querySelector(".card-text").textContent = inputDescription;
+            carta.style.visibility = "visible";
+            icono.style.visibility = "hidden";
+
+            
+            contenido.innerHTML += `<div class="card card-note" style="width: 18rem;">
+                                        <i class="bi bi-bookmark"></i>
+                                        <div class="card-body">
+                                            <h5 class="card-title">${inputnName}</h5>
+                                            <p class="card-text">${inputDescription}</p>
+                                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                                        </div>
+                                        <i class="bi bi-plus-square-dotted" data-bs-toggle="modal" data-bs-target="#exampleModal"></i>
+                                    </div>`
+            
+        });
+
+        usuario.setListFile = listFile;
+        localStorage.setItem("login-User", JSON.stringify(usuario)); //Colocar esto al final de todo el codigo...
+        console.log("encontrado: ", usuario);//Y esto tambien
+
+    });
+});
+
+/*
+//Evento para crear una Tarea
+const conten = document.querySelector(".create-task");
+conten.addEventListener("click", ()=> {
+    const inputnName = document.getElementById("exampleFormControlInput1").value;
+    const inputDescription = document.getElementById("exampleFormControlTextarea1").value;
+
+    const valor = getUserLocalStorage("login-User");
+    const user = createUserObject(valor); //devuelve un Usuario
+    const objetFile =   user.getListFile.map(item => {
+                            const isFile = new File(item.nameFile);
+                            isFile.setIsActive = item._isActive;
+
+                                isFile.tasks.map(p => {
+                                    const tarea = new Task(p.titleNote, p.textNote);  
+                                    isFile.addTask(tarea);
+                                });
+                                return isFile;
+                            }
+                        );
+    //const objetTask = createLocalStorageTask(objetFile);//devuelve un array de Tareas
+    let tarea = new Task(inputnName, inputDescription);
+    const archivos = user.getListFile.map(item => {
+        return new File(item.getName())
+    });
+
+    console.log(archivos);
+});
+*/
