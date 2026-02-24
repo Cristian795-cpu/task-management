@@ -164,10 +164,16 @@ body {
     display: grid;
     justify-content: center;
     align-content: center;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);  /* 4 columnas */
+    grid-template-rows: repeat(2, 1fr);      /* 2 filas */
     gap: 20px;
     padding: 20px;
+    box-sizing: border-box;  /* Importante: incluye padding en el tamaño total */
+    
+    /* Evitar desbordamiento */
+    overflow: hidden;        /* Oculta lo que se salga */
+    /* O usa auto si quieres scroll */
+    /* overflow: auto; */
 }
 
 .profile-edit {
@@ -214,8 +220,10 @@ body {
     height: 15rem;
     display: flex;
     justify-content: center;
-    align-items: center;
-    visibility: hidden;
+    visibility: visible;
+    -webkit-line-clamp: 3;         /* Límite de 3 líneas */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .bi-plus-square-dotted {
@@ -229,4 +237,16 @@ body {
 
 .bi-plus-square-dotted:hover {
     color: #ffffff;
+}
+
+.div-create-task {
+    margin-top: -600px;
+    margin-left: 1770px;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: visible;
+    z-index: 10;
 }
