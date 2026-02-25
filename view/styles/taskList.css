@@ -94,7 +94,7 @@ body {
 }
 
 .bi-trash-fill:hover {
-    color: red;
+    color: aliceblue;
 }
 
 .file-notebook {
@@ -107,6 +107,9 @@ body {
     margin-top: 10px;
     margin-left: 10px;
     font-size: 20px;
+    overflow: hidden;
+    -webkit-line-clamp: 3;         /* Límite de 3 líneas */
+    -webkit-box-orient: vertical; 
 }
 
 .content-App-web {
@@ -240,13 +243,60 @@ body {
 }
 
 .div-create-task {
-    margin-top: -600px;
-    margin-left: 1770px;
+    margin-top: -620px;
+    margin-left: 1710px;
     position: absolute;
-    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
     visibility: visible;
     z-index: 10;
+}
+
+.bi-bookmark, .bi-bookmark-fill {
+    margin-left: 230px;
+    cursor: pointer;
+}
+
+#btn-task {
+    width: 160px;
+    height: 50px;
+    background-color: #023535;
+    border: none;
+    color: aliceblue;
+    font-size: 20px;
+    transition: background 0.5s ease;
+}
+
+#btn-task:hover {
+    background-color: #107361;
+}
+
+.div-log-out {
+    width: 160px;
+    margin-top: -950px;
+    margin-left: 1690px;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: visible;
+    z-index: 11;
+}
+
+#btn-log-out {
+    width: 160px;
+    display: flex;
+    background-color: #ffffff;
+    border: none;
+    color: rgb(0, 0, 0);
+    font-size: 20px;
+    transition: background 0.5s ease;
+    border: solid 3px #000000;
+}
+
+.log-out {
+    margin-left: 10px;
+    margin-top: 15px;
+    font-size: 20px;
 }

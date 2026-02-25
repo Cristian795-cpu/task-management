@@ -1,7 +1,9 @@
 export class Task {
-    constructor(titleNote, textNote) {
+    // Ahora acepta un tercer parámetro `bookmarked` (default false)
+    constructor(titleNote, textNote, bookmarked = false) {
         this.titleNote = titleNote;
         this.textNote = textNote;
+        this.bookmarked = bookmarked;
     }
 
     set setTextNote(textNote) {
@@ -18,6 +20,15 @@ export class Task {
 
     get getTitleNote() {
         return this.titleNote;
+    }
+
+    // Bookmark getters/setters
+    set setBookmarked(value) {
+        this.bookmarked = !!value;
+    }
+
+    get isBookmarked() {
+        return this.bookmarked === true;
     }
 
 }

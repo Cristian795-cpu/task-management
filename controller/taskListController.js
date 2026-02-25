@@ -64,15 +64,22 @@ function main (){
 main()
 
 function saveUserFiles(inputNotebook) {
-    //Transforma el string a objeto Json para acceder a las propiedades
-    const userJson = getUserLocalStorage("login-User");
-    let userLogin = createFileList(userJson, inputNotebook);
-    saveLocalStoreOfRegisteredUser(userLogin, "login-User");
+    // Obtener el objeto actual del usuario en sesión
+    const userJson = getUserLocalStorage("login-User") || {};
+    // Asegurar que listFile existe y es un array
+    if (!Array.isArray(userJson.listFile)) userJson.listFile = [];
 
-    console.log("{nombre: " + userLogin.getName + 
-                ", email: " + userLogin.getEmail + 
-                ", password: " + userLogin.getPassword + 
-                ", notebook: ", userLogin.getListFile);
+    // Añadir nuevo cuaderno como objeto plano (preserva estructura serializable)
+    userJson.listFile.push({
+        nameFile: inputNotebook,
+        tasks: [],
+        _isActive: false
+    });
+
+    // Guardar directamente el objeto actualizado (no recrear instancias que pierdan tareas)
+    saveLocalStoreOfRegisteredUser(userJson, "login-User");
+
+    console.log("Añadido notebook:", inputNotebook, "->", userJson.listFile);
 }
 
 
@@ -124,6 +131,17 @@ contenedor.addEventListener("click", (e) => {
             
             console.log("✅ Eliminado:", tituloEliminar);
             console.log("📚 Lista actualizada:", userJson.listFile);
+
+            // Vaciar el contenedor de tarjetas si el cuaderno eliminado estaba abierto
+            const cardsContainer = document.querySelector('.content-cards-notes');
+            if (cardsContainer) {
+                while (cardsContainer.firstChild) {
+                    cardsContainer.removeChild(cardsContainer.firstChild);
+                }
+            }
+            // Reset de estado local
+            contador = 1;
+            currentFile = null;
         }
 
         //lista auxiliar de file
@@ -134,200 +152,230 @@ contenedor.addEventListener("click", (e) => {
     }
 });
 
-//Evento para seleccionar un Archivo y cambiar de color
-const fileBox = document.querySelectorAll('.file');
-const contenido = document.querySelector(".content-cards-notes");
+// Variables GLOBALES (declaradas fuera de todos los eventos)
+let currentFile = null; // Archivo actualmente seleccionado
+let currentUserData = null; // Datos del usuario actual
 let contador = 1;
-fileBox.forEach(color => {
-    color.addEventListener('click', () => {
-        //Obtener el texto del título del cuaderno seleccionado
-        const text = color.querySelector('.notebook-title').textContent.trim();
-        const jsonParse = getUserLocalStorage('login-User');
-        const listFile = createLocalStorageFile(jsonParse); //aquí ya es una lista de archivos
-        const texto = listFile.find(archivo=> text === archivo.nameFile);
 
-        // Marcar en el JSON cuál es el archivo activo y guardarlo inmediatamente
-        if (jsonParse && Array.isArray(jsonParse.listFile)) {
-            const clickedName = (text || '').toString().trim().toLowerCase();
-            jsonParse.listFile.forEach(f => {
-                const fileName = (f.nameFile || '').toString().trim().toLowerCase();
-                f._isActive = (fileName === clickedName);
-            });
-            saveLocalStoreOfRegisteredUser(jsonParse, 'login-User');
-        }
+// Contenedores
+const contenido = document.querySelector(".content-cards-notes");
+const contenedorFiles = document.querySelector('.container-files');
 
-        // Limpiar siempre el contenedor de tareas
-        while (contenido.firstChild) {
-            contenido.removeChild(contenido.firstChild);
-        }
-        contador = 1; // reiniciar contador al cargar un cuaderno
+// Delegación de eventos para seleccionar un Archivo (funciona para elementos dinámicos)
+contenedorFiles.addEventListener('click', (e) => {
+    // Evitar interferir con el manejador de eliminar (icono basura)
+    if (e.target.classList.contains('bi-trash-fill')) return;
 
-        // Obtener usuario desde localStorage y validar estructura
-        const jsonUser = getUserLocalStorage("login-User");
-        if (!jsonUser || !Array.isArray(jsonUser.listFile)) {
-            // No hay datos que mostrar
-            return;
-        }
+    const fileDiv = e.target.closest('.file');
+    if (!fileDiv) return; // No se hizo click en un .file
 
-        // Reconstruir objetos File (y sus Task) desde JSON
-        const files = createLocalStorageFile(jsonUser);
+    // Obtener el texto del título del cuaderno seleccionado
+    const text = fileDiv.querySelector('.notebook-title').textContent.trim();
+    const jsonParse = getUserLocalStorage('login-User');
 
-        // Buscar el archivo activo (_isActive === true)
-        const activeFile = files.find(f => (typeof f.getIsActive === 'function' ? f.getIsActive() === true : f._isActive === true));
+    // Guardar en variable global
+    currentUserData = jsonParse;
 
-        // Obtener tareas del archivo activo de forma segura
-        let tasksToRender = [];
-        if (activeFile && typeof activeFile.getTasks === 'function') {
-            const rawTasks = activeFile.getTasks() || [];
-            rawTasks.forEach(t => {
-                if (!t) return;
-                // Si ya es instancia de Task con getters
-                if (typeof t.getTitleNote === 'function' && typeof t.getTextNote === 'function') {
-                    tasksToRender.push(t);
-                } else {
-                    // Si es un objeto plano desde JSON, crear instancia Task
-                    tasksToRender.push(new Task(t.titleNote || t.getTitleNote || '', t.textNote || t.getTextNote || ''));
-                }
-            });
-        }
+    const listFile = createLocalStorageFile(jsonParse);
+    const archivoSeleccionado = listFile.find(archivo => text === archivo.nameFile);
 
-        // Construir la lista de tareas en la interfaz (solo del archivo activo)
-        tasksToRender.forEach(item => {
+    // Guardar archivo actual en variable global
+    currentFile = archivoSeleccionado;
+
+    // Marcar en el JSON cuál es el archivo activo
+    if (jsonParse && Array.isArray(jsonParse.listFile)) {
+        jsonParse.listFile.forEach(f => {
+            f._isActive = (f.nameFile === text);
+        });
+        saveLocalStoreOfRegisteredUser(jsonParse);
+    }
+
+    // Limpiar contenedor
+    while (contenido.firstChild) {
+        contenido.removeChild(contenido.firstChild);
+    }
+    contador = 1;
+
+    // Cargar tareas del archivo activo
+    if (archivoSeleccionado) {
+        const tareas = archivoSeleccionado.getTasks() || [];
+
+        tareas.forEach(tarea => {
             const nuevoDiv = document.createElement('div');
-            nuevoDiv.id = "card-" + (contenido.children.length + contador);
+            nuevoDiv.id = "card-" + contador;
             nuevoDiv.className = "card card-note";
             nuevoDiv.style.width = "18rem";
-            nuevoDiv.innerHTML += ` <i class="bi bi-bookmark"></i>
-                                    <div class="card-body">
-                                        <h5 class="card-title">${item.getTitleNote}</h5>
-                                        <p class="card-text">${item.getTextNote}</p>
-                                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                                    </div>`
+
+            // Obtener título y descripción correctamente
+            const titulo = typeof tarea.getTitleNote === 'function' ? 
+                tarea.getTitleNote() : tarea.titleNote;
+            const descripcion = typeof tarea.getTextNote === 'function' ? 
+                tarea.getTextNote() : tarea.textNote;
+            const isBookmarked = tarea.bookmarked === true;
+            const bookmarkClass = isBookmarked ? 'bi-bookmark-fill' : 'bi-bookmark';
+
+            nuevoDiv.innerHTML = ` 
+                <i class="bi ${bookmarkClass}" data-title="${titulo}" data-desc="${descripcion}"></i>
+                <div class="card-body">
+                    <h5 class="card-title">${titulo}</h5>
+                    <p class="card-text">${descripcion}</p>
+                </div>
+            `;
+            
+            // Agregar evento al bookmark y actualizar el estado en localStorage
+            const bookmark = nuevoDiv.querySelector('.bi');
+            if (bookmark) {
+                bookmark.addEventListener('click', () => {
+                    const currentlyBookmarked = bookmark.classList.contains('bi-bookmark-fill');
+                    if (currentlyBookmarked) {
+                        bookmark.classList.remove('bi-bookmark-fill');
+                        bookmark.classList.add('bi-bookmark');
+                    } else {
+                        bookmark.classList.remove('bi-bookmark');
+                        bookmark.classList.add('bi-bookmark-fill');
+                    }
+
+                    // Actualizar en currentUserData y guardar
+                    const fileName = text; // nombre del cuaderno seleccionado
+                    if (currentUserData && Array.isArray(currentUserData.listFile)) {
+                        const fileJson = currentUserData.listFile.find(f => f.nameFile === fileName);
+                        if (fileJson && Array.isArray(fileJson.tasks)) {
+                            const taskObj = fileJson.tasks.find(t => t.titleNote === titulo && t.textNote === descripcion);
+                            if (taskObj) {
+                                taskObj.bookmarked = !currentlyBookmarked;
+                                saveLocalStoreOfRegisteredUser(currentUserData);
+                            }
+                        }
+                    }
+                });
+            }
+
             contenido.appendChild(nuevoDiv);
             contador++;
         });
+    }
 
-        fileBox.forEach(variable => {
-            variable.style.backgroundColor = "";
-        });
-         
-        if(texto){
-            console.log("encontrado: ", texto);
-            texto.setIsActive(true);
-            color.style.backgroundColor = "#ffffff";
-        }
-        
-        const usuario = createUserObject(jsonParse);
-
-        //Evento para crear una Tarea
-        const conten = document.querySelector(".create-task");
-        conten.addEventListener("click", ()=> {
-
-            //Obtener los valores de los inputs
-            const inputnName = document.getElementById("exampleFormControlInput1").value;
-            const inputDescription = document.getElementById("exampleFormControlTextarea1").value;
-
-            //Crear una nueva tarea con los valores obtenidos
-            const tarea = new Task(inputnName, inputDescription);
-
-            //Agregar la tarea al archivo activo en el localStorage (usar jsonParse para mantener sincronía)
-            if (jsonParse && Array.isArray(jsonParse.listFile)) {
-                const clickedName = (text || '').toString().trim().toLowerCase();
-                const fileObj = jsonParse.listFile.find(f => (f.nameFile || '').toString().trim().toLowerCase() === clickedName);
-                if (fileObj) {
-                    fileObj.tasks = fileObj.tasks || [];
-                    fileObj.tasks.push({ titleNote: inputnName, textNote: inputDescription });
-                }
-                // Asegurar que solo ese archivo esté marcado como activo
-                jsonParse.listFile.forEach(f => {
-                    f._isActive = ((f.nameFile || '').toString().trim().toLowerCase() === clickedName);
-                });
-                // Guardar en localStorage
-                saveLocalStoreOfRegisteredUser(jsonParse, 'login-User');
-                // Sincronizar el objeto `usuario` en memoria con los cambios guardados
-                if (typeof usuario !== 'undefined' && usuario) {
-                    usuario.setListFile = createLocalStorageFile(jsonParse);
-                }
-            }
-            
-            console.log(listFile)
-
-            //Cerrar el modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
-            if (modal) modal.hide();
-
-            //Agregar la tarea a la interfaz
-            //const contenido = document.querySelector(".content-cards-notes");
-            const carta = document.getElementById("card-" + (contenido.children.length + contador));
-            //document.querySelector(".card-title").textContent = inputnName;
-            //document.querySelector(".card-text").textContent = inputDescription;
-
-            //Condicional para validar los campos
-            if(contenido.children.length === 0 && (inputnName === "" || inputDescription === "")) {
-                alert("¡Por favor, completa ambos campos para crear una tarea!");
-                return;
-            }
-
-            else if(contenido.children.length >= 8) {
-                // Ocultar el ícono de la última card si existe
-                if(contenido.children.length > 0) {
-                    const ultimaCard = contenido.lastElementChild;
-                    //const iconoUltimo = ultimaCard.querySelector('.bi-plus-square-dotted');
-                    if(iconoUltimo) {
-                        iconoUltimo.style.visibility = 'hidden';
-                    }
-                }
-                alert("¡Has alcanzado el límite de tareas para este cuaderno!");
-                return;
-            } else {
-
-                // Crear una nueva card para la tarea
-                const nuevoDiv = document.createElement('div');
-                nuevoDiv.id = "card-" + (contenido.children.length + contador);
-                nuevoDiv.className = "card card-note";
-                nuevoDiv.style.width = "18rem";
-                
-                // Agregar el contenido a la nueva card
-                nuevoDiv.innerHTML += ` <i class="bi bi-bookmark"></i>
-                                        <div class="card-body">
-                                            <h5 class="card-title">${inputnName}</h5>
-                                            <p class="card-text">${inputDescription}</p>
-                                            <a href="#" class="btn btn-primary">Go somewhere</a>
-                                        </div>`
-
-                // Agregar la nueva card al contenedor
-                contenido.appendChild(nuevoDiv);
-                contador++; // Incrementar el contador para el próximo ID
-
-                // Obtener el número total de cards
-                const totalCards = contenido.children.length;
-
-                // Mostrar la última card si se alcanza el límite de 8
-                if(totalCards === 8) {
-                    const ultimaCard = contenido.lastElementChild;
-                    const iconoUltimo = ultimaCard.querySelector('.bi-plus-square-dotted');
-                    if(iconoUltimo) {
-                        ultimaCard.style.visibility = 'visible';
-                    }
-                }
-                
-                // Mostrar la penúltima card si se elimina una tarea y hay más de 1 card
-                if(contenido.children.length > 1) {
-                    const cardAnterior = contenido.children[contenido.children.length - 2];
-                    if(cardAnterior) {
-                        if(contenido.children.length <= 8) {
-                            cardAnterior.style.visibility = 'visible';
-                        }
-                    }
-                } 
-                //Actualizar el localStorage con la nueva tarea 
-                usuario.setListFile = listFile;
-                localStorage.setItem("login-User", JSON.stringify(usuario));
-                console.log("encontrado: ", usuario); 
-            } 
-        });
-
-        
-
-    });
+    // Cambiar color del notebook seleccionado (compatible con elementos creados dinámicamente)
+    document.querySelectorAll('.file').forEach(v => v.style.backgroundColor = "");
+    fileDiv.style.backgroundColor = "#ffffff";
 });
+
+// Evento para crear una Tarea
+const btnTask = document.querySelector(".create-task");
+btnTask.addEventListener("click", () => {
+    // Validar que hay un notebook seleccionado
+    if (!currentFile) {
+        alert("Por favor, selecciona un cuaderno primero");
+        return;
+    }
+
+    // Obtener valores de los inputs
+    const inputName = document.getElementById("exampleFormControlInput1").value;
+    const inputDescription = document.getElementById("exampleFormControlTextarea1").value;
+
+    // Validar campos vacíos
+    if (inputName === "" || inputDescription === "") {
+        alert("¡Por favor, completa ambos campos para crear una tarea!");
+        return;
+    }
+
+    // Validar límite de tareas (8 por cuaderno)
+    if (contenido.children.length >= 8) {
+        alert("¡Has alcanzado el límite de tareas para este cuaderno!");
+        return;
+    }
+
+    // Crear nueva tarea
+    const nuevaTarea = new Task(inputName, inputDescription);
+    
+    // Agregar tarea al archivo actual
+    currentFile.addTask(nuevaTarea);
+
+    // Actualizar localStorage
+    if (currentUserData && Array.isArray(currentUserData.listFile)) {
+        // Buscar el archivo en los datos JSON
+        const fileJson = currentUserData.listFile.find(f => f.nameFile === currentFile.nameFile);
+        if (fileJson) {
+            // Inicializar array de tareas si no existe
+            if (!fileJson.tasks) fileJson.tasks = [];
+
+            // Agregar la nueva tarea (incluye bookmarked:false por defecto)
+            fileJson.tasks.push({
+                titleNote: inputName,
+                textNote: inputDescription,
+                bookmarked: false
+            });
+
+            // Guardar en localStorage
+            saveLocalStoreOfRegisteredUser(currentUserData);
+        }
+    }
+
+    // Crear card en la interfaz
+    const nuevoDiv = document.createElement('div');
+    nuevoDiv.id = "card-" + contador;
+    nuevoDiv.className = "card card-note";
+    nuevoDiv.style.width = "18rem";
+
+    nuevoDiv.innerHTML = ` 
+        <i class="bi bi-bookmark"></i>
+        <div class="card-body">
+            <h5 class="card-title">${inputName}</h5>
+            <p class="card-text">${inputDescription}</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+    `;
+    // Agregar event listener al bookmark de la nueva tarjeta
+    const newBookmark = nuevoDiv.querySelector('.bi-bookmark');
+    if (newBookmark) {
+        newBookmark.addEventListener('click', () => {
+            const currentlyBookmarked = newBookmark.classList.contains('bi-bookmark-fill');
+            if(currentlyBookmarked) {
+                newBookmark.classList.remove('bi-bookmark-fill');
+                newBookmark.classList.add('bi-bookmark'); 
+            } else{
+                newBookmark.classList.remove('bi-bookmark');
+                newBookmark.classList.add('bi-bookmark-fill')
+            }
+
+            // Actualizar en localStorage la tarea recién creada
+            if (currentUserData && Array.isArray(currentUserData.listFile)) {
+                const fileJson = currentUserData.listFile.find(f => f.nameFile === currentFile.nameFile);
+                if (fileJson && Array.isArray(fileJson.tasks)) {
+                    const t = fileJson.tasks.find(task => task.titleNote === inputName && task.textNote === inputDescription);
+                    if (t) {
+                        t.bookmarked = !currentlyBookmarked;
+                        saveLocalStoreOfRegisteredUser(currentUserData);
+                    }
+                }
+            }
+        });
+    }
+
+    contenido.appendChild(nuevoDiv);
+    contador++;
+
+    // Cerrar el modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+    if (modal) modal.hide();
+
+    // Limpiar inputs
+    document.getElementById("exampleFormControlInput1").value = "";
+    document.getElementById("exampleFormControlTextarea1").value = "";
+    
+    console.log("Tarea creada:", nuevaTarea);
+    console.log("Archivo actual:", currentFile);
+});
+
+// Listener para el botón de logout: elimina la sesión y redirige al login
+const btnLogout = document.getElementById('btn-log-out');
+if (btnLogout) {
+    btnLogout.addEventListener('click', (e) => {
+        // Previene comportamiento por defecto de cualquier data-bs
+        e.preventDefault();
+        // Eliminar usuario en sesión
+        localStorage.removeItem('login-User');
+        // Redirigir a la página de login
+        window.location.href = 'login.html';
+    });
+}
