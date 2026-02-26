@@ -316,6 +316,7 @@ btnTask.addEventListener("click", () => {
     nuevoDiv.id = "card-" + contador;
     nuevoDiv.className = "card card-note";
     nuevoDiv.style.width = "18rem";
+    nuevoDiv.style.boxShadow = "0 4px 20px rgb(0, 0, 0)";
 
     nuevoDiv.innerHTML = ` 
         <i class="bi bi-bookmark"></i>
